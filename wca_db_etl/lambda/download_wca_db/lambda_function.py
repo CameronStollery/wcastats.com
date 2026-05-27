@@ -14,7 +14,7 @@ BUCKET_NAME = (
     "wcastats-wca-results-db-268977875744-ap-southeast-2-an"
 )
 
-RESULTS_FILE = "WCA_export_Results.tsv"
+RESULTS_FILE = "WCA_export_results.tsv"
 
 s3_client = boto3.client("s3")
 
@@ -128,6 +128,7 @@ def process_standard_table(
     (
         lazy_df
         .collect(streaming=True)
+        .drop("event_id")       # Athena derives column from path as files are partitioned by event_id
         .write_parquet(
             parquet_buffer,
             compression="snappy",
@@ -154,7 +155,7 @@ def process_standard_table(
 
 def process_results_table(file_path: str):
     """
-    Process WCA results table partitioned by eventId.
+    Process WCA results table partitioned by event_id.
     """
 
     table_name = "results"
@@ -167,7 +168,7 @@ def process_results_table(file_path: str):
 
     event_ids = (
         lazy_df
-        .select("eventId")
+        .select("event_id")
         .unique()
         .collect(streaming=True)
         .to_series()
@@ -178,14 +179,14 @@ def process_results_table(file_path: str):
     print(f"Found {len(event_ids)} event partitions")
 
     for event_id in event_ids:
-        print(f"Processing eventId={event_id}")
+        print(f"Processing event_id={event_id}")
 
         parquet_buffer = io.BytesIO()
 
         (
             lazy_df
             .filter(
-                pl.col("eventId") == event_id
+                pl.col("event_id") == event_id
             )
             .collect(streaming=True)
             .write_parquet(
