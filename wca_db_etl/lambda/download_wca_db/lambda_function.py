@@ -199,7 +199,7 @@ def process_results_table(file_path: str):
 
         s3_key = (
             f"raw/{table_name}/"
-            f"eventId={event_id}/"
+            f"event_id={event_id}/"
             f"data.parquet"
         )
 
