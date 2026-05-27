@@ -128,7 +128,6 @@ def process_standard_table(
     (
         lazy_df
         .collect(streaming=True)
-        .drop("event_id")       # Athena derives column from path as files are partitioned by event_id
         .write_parquet(
             parquet_buffer,
             compression="snappy",
@@ -188,6 +187,7 @@ def process_results_table(file_path: str):
             .filter(
                 pl.col("event_id") == event_id
             )
+            .drop("event_id")       # Athena derives column from path as files are partitioned by event_id
             .collect(streaming=True)
             .write_parquet(
                 parquet_buffer,
