@@ -4,3 +4,4 @@ wca_db_etl/lambda/download_wca_db/.venv
 wca_db_etl/lambda/download_wca_db/download_wca_db_dependencies
 wca_db_etl/lambda/download_wca_db/download_wca_db_dependencies_linux
 wca_db_etl/lambda/download_wca_db/pyarrow_layer
+*.pyc
